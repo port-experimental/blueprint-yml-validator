@@ -8,6 +8,7 @@ A tool for validating YAML files against Port's API. This validator ensures that
 - Asynchronous processing for faster validation
 - Supports custom YAML file paths
 - Pydantic validation for entities and settings
+- Modular code structure for better maintainability
 
 ## Requirements
 
@@ -35,6 +36,21 @@ You can also use the Docker image:
 docker pull ghcr.io/your-org/github-validator:latest
 ```
 
+## Project Structure
+
+```
+.
+├── main.py                      # Main script for validating all YAML files
+├── validate_artifact_blueprint.py # Script for validating devportal-api.yaml
+├── port_common/                 # Shared modules
+│   ├── __init__.py             # Package initialization
+│   ├── settings.py             # Port API settings and authentication
+│   ├── models.py               # Pydantic models for validation
+│   └── api.py                  # API interaction functions
+├── .github/workflows/          # GitHub Actions workflows
+└── requirements.txt            # Python dependencies
+```
+
 ## Usage
 
 ### Local Usage
@@ -49,6 +65,9 @@ python main.py
 
 # Run with specific YAML files or directories
 python main.py --paths path/to/file.yaml path/to/directory
+
+# Run validation for devportal-api.yaml only
+python validate_artifact_blueprint.py
 ```
 
 ### Docker Usage

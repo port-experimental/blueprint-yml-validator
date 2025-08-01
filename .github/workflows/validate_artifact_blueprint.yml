@@ -1,0 +1,28 @@
+name: Validate Devportal Blueprint
+
+on:
+  pull_request:
+    paths:
+      - 'devportal-api.yaml'
+
+jobs:
+  validate-blueprint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml requests
+
+      - name: Run validation script
+        env:
+          PORT_CLIENT_ID: ${{ secrets.PORT_CLIENT_ID }}
+          PORT_CLIENT_SECRET: ${{ secrets.PORT_CLIENT_SECRET }}
+        run: python validate_artifact_blueprint.py
