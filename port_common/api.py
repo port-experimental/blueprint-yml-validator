@@ -21,6 +21,43 @@ async def get_entity(client: httpx.AsyncClient, settings: PortSettings, identifi
     response = await client.get(url, headers=settings.headers)
     return response.status_code == 200
 
+async def get_blueprint_schema(client: httpx.AsyncClient, settings: PortSettings, blueprint: str) -> Dict[str, Any]:
+    """Get the schema for a blueprint from Port."""
+    # Check if token needs refresh
+    if settings.token_expired:
+        await settings.get_access_token(client)
+    
+    url = f"{settings.PORT_BASE_URL}/blueprints/{blueprint}"
+    response = await client.get(url, headers=settings.headers)
+    return response.json()
+
+
+async def validate_required_fields(client: httpx.AsyncClient, settings: PortSettings, data: Dict[str, Any], blueprint_name: str) -> List[str]:
+    """Validate that all required fields from the blueprint schema are present in the data."""
+    errors = []
+    
+    try:
+        # Get the blueprint schema from Port API
+        blueprint_data = await get_blueprint_schema(client, settings, blueprint_name)
+        
+        # Extract required fields from the schema
+        required_fields = blueprint_data.get("blueprint", {}).get("schema", {}).get("required", [])
+        
+        if required_fields:
+            print(f"Required fields according to blueprint schema: {', '.join(required_fields)}")
+            
+            # Check if all required fields are present in the data
+            properties = data.get("properties", {})
+            missing_fields = [field for field in required_fields if field not in properties]
+            
+            if missing_fields:
+                errors.append(f"Missing required fields: {', '.join(missing_fields)}")
+                
+    except Exception as e:
+        errors.append(f"Error validating required fields: {str(e)}")
+        
+    return errors
+
 
 async def validate_entity(client: httpx.AsyncClient, settings: PortSettings, payload: Dict[str, Any]) -> Tuple[bool, Dict[str, Any]]:
     """Validate an entity against Port's API."""
@@ -94,6 +131,14 @@ async def process_file(client: httpx.AsyncClient, settings: PortSettings, file_p
         identifier = port_yaml.identifier
         blueprint = port_yaml.blueprint
         
+        # Validate required fields from blueprint schema
+        print(f"Validating required fields for {file_path} against {blueprint} blueprint schema...")
+        schema_errors = await validate_required_fields(client, settings, data, blueprint)
+        if schema_errors:
+            errors.extend(schema_errors)
+            return errors
+        
+        # Check if entity exists
         exists = await get_entity(client, settings, identifier, blueprint)
         print(f"Entity '{identifier}' of blueprint '{blueprint}' exists: {exists}")
         if not exists:

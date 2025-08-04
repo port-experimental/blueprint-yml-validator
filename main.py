@@ -1,8 +1,6 @@
 import sys
 import asyncio
 import argparse
-from pathlib import Path
-from typing import List
 import httpx
 
 from port_common.settings import PortSettings

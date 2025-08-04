@@ -25,4 +25,4 @@ jobs:
         env:
           PORT_CLIENT_ID: ${{ secrets.PORT_CLIENT_ID }}
           PORT_CLIENT_SECRET: ${{ secrets.PORT_CLIENT_SECRET }}
-        run: python validate_artifact_blueprint.py
+        run: python main.py
