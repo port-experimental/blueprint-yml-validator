@@ -3,7 +3,9 @@ name: Validate Devportal Blueprint
 on:
   pull_request:
     paths:
-      - 'devportal-api.yaml'
+      - '**.yml'
+      - '**.yaml'
+
 
 jobs:
   validate-blueprint:

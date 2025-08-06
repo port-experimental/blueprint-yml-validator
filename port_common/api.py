@@ -4,6 +4,8 @@ from typing import Dict, Any, Tuple, List
 from pathlib import Path
 
 from port_common.settings import PortSettings
+from port_common.models import PortYaml
+
 
 def load_yaml(path: str) -> Dict[str, Any]:
     """Load and parse a YAML file."""
@@ -123,7 +125,6 @@ async def process_file(client: httpx.AsyncClient, settings: PortSettings, file_p
                 return [f"YAML parse error in {file_path}: {str(e)}"]
         
         try:
-            from port_common.models import PortYaml
             port_yaml = PortYaml(**data)
         except ValueError as e:
             return [f"Invalid YAML structure in {file_path}: {str(e)}"]
