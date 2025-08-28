@@ -27,6 +27,10 @@ A tool for validating YAML files against Port's API. This validator ensures that
 git clone https://github.com/your-org/github-validator.git
 cd github-validator
 
+#setup virtual env
+python -m venv venv
+source venv/bin/activate
+
 # Install dependencies
 pip install -r requirements.txt
 ```
@@ -36,7 +40,24 @@ pip install -r requirements.txt
 You can also use the Docker image:
 
 ```bash
-docker pull ghcr.io/your-org/github-validator:latest
+docker pull ghcr.io/port-experimental/github-validator:latest
+```
+
+When running the Docker image, you need to provide the required environment variables:
+
+```bash
+docker run -e PORT_CLIENT_ID=your_client_id -e PORT_CLIENT_SECRET=your_client_secret ghcr.io/port-experimental/github-validator:latest
+```
+
+Alternatively, you can use an environment file:
+
+```bash
+# Create a .env file with your credentials
+echo "PORT_CLIENT_ID=your_client_id" > .env
+echo "PORT_CLIENT_SECRET=your_client_secret" >> .env
+
+# Run the container with the environment file
+docker run --env-file .env ghcr.io/port-experimental/github-validator:latest
 ```
 
 ## Project Structure
