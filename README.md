@@ -92,6 +92,11 @@ docker run --env-file .env ghcr.io/port-experimental/blueprint-yml-validator:lat
 │   ├── models.py               # Pydantic models for validation
 │   └── api.py                  # API interaction functions
 ├── .github/workflows/          # GitHub Actions workflows
+│   ├── docker.yml              # Workflow to build and push Docker image
+│   └── validate_blueprint.yml  # Workflow to validate YAML files on PRs
+├── Dockerfile                  # Docker configuration for the validator
+├── .dockerignore               # Files to exclude from Docker builds
+├── .env.example                # Example environment variables
 └── requirements.txt            # Python dependencies
 ```
 
