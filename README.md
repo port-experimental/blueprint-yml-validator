@@ -40,13 +40,34 @@ pip install -r requirements.txt
 You can also use the Docker image:
 
 ```bash
-docker pull ghcr.io/port-experimental/github-validator:latest
+docker pull ghcr.io/port-experimental/blueprint-yml-validator:latest
 ```
+
+#### Authentication
+
+If the image is in a private repository, you'll need to authenticate first:
+
+```bash
+# Login to GitHub Container Registry
+echo $GITHUB_TOKEN | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+```
+
+You'll need a GitHub Personal Access Token with the `read:packages` scope.
+
+#### Platform Compatibility
+
+If you encounter platform compatibility issues (e.g., ARM64 vs AMD64), you can specify the platform:
+
+```bash
+docker pull --platform linux/amd64 ghcr.io/port-experimental/blueprint-yml-validator:latest
+```
+
+#### Environment Variables
 
 When running the Docker image, you need to provide the required environment variables:
 
 ```bash
-docker run -e PORT_CLIENT_ID=your_client_id -e PORT_CLIENT_SECRET=your_client_secret ghcr.io/port-experimental/github-validator:latest
+docker run -e PORT_CLIENT_ID=your_client_id -e PORT_CLIENT_SECRET=your_client_secret ghcr.io/port-experimental/blueprint-yml-validator:latest
 ```
 
 Alternatively, you can use an environment file:
@@ -57,7 +78,7 @@ echo "PORT_CLIENT_ID=your_client_id" > .env
 echo "PORT_CLIENT_SECRET=your_client_secret" >> .env
 
 # Run the container with the environment file
-docker run --env-file .env ghcr.io/port-experimental/github-validator:latest
+docker run --env-file .env ghcr.io/port-experimental/blueprint-yml-validator:latest
 ```
 
 ## Project Structure

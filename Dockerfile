@@ -6,9 +6,10 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the script and port_common module
-COPY main.py .
-COPY port_common/ ./port_common/
+# Copy the entire
+COPY . .
 
 # Set the entrypoint
 ENTRYPOINT ["python", "main.py"]
+CMD ["./"]
+
