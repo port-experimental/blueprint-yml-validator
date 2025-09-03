@@ -1,16 +1,20 @@
 ---
 # This is a sample YAML file that follows the expected structure
-identifier: "sample-entity"
-blueprint: "sampleBlueprint"
-title: "Sample Entity"
-# Required fields must be in the properties section
-properties:
-  url: "https://github.com/example/sample-repo"
-  description: "This is a sample entity that follows the expected structure"
-  status: "active"
-  version: "1.0.0"
-# Optional relations section
+identifier: myBlueprint
+title: My title
+description: My description
+icon: My icon
+schema:
+  properties: {}
+  required: []
 relations:
-  dependencies:
-    - "dependency-1"
-    - "dependency-2"
+  mySingleRelation:
+    title: My title
+    target: myTargetBlueprint
+    required: true
+    many: false
+  myManyRelation:
+    title: Related Items
+    target: anotherTargetBlueprint
+    required: false
+    many: true
