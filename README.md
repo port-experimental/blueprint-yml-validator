@@ -24,8 +24,8 @@ A tool for validating YAML files against Port's API. This validator ensures that
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/github-validator.git
-cd github-validator
+git clone https://github.com/your-org/blueprint-yml-validator.git
+cd blueprint-yml-validator
 
 #setup virtual env
 python -m venv venv

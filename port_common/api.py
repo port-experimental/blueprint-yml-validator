@@ -34,9 +34,10 @@ async def get_blueprint_schema(client: httpx.AsyncClient, settings: PortSettings
     return response.json()
 
 
-async def validate_required_fields(client: httpx.AsyncClient, settings: PortSettings, data: Dict[str, Any], blueprint_name: str) -> List[str]:
-    """Validate that all required fields from the blueprint schema are present in the data."""
+async def validate_required_fields_and_relations(client: httpx.AsyncClient, settings: PortSettings, data: Dict[str, Any], blueprint_name: str) -> List[str]:
+    """Validate that all required fields and relations from the blueprint schema are present in the data."""
     errors = []
+    relations_errors = []
     
     try:
         # Get the blueprint schema from Port API
@@ -44,9 +45,10 @@ async def validate_required_fields(client: httpx.AsyncClient, settings: PortSett
         
         # Extract required fields from the schema
         required_fields = blueprint_data.get("blueprint", {}).get("schema", {}).get("required", [])
+        # Extract relations from blueprint schema
+        blueprint_relations = blueprint_data.get("blueprint", {}).get("relations", {})
         
         if required_fields:
-            print(f"Required fields according to blueprint schema: {', '.join(required_fields)}")
             
             # Check if all required fields are present in the data
             properties = data.get("properties", {})
@@ -55,10 +57,29 @@ async def validate_required_fields(client: httpx.AsyncClient, settings: PortSett
             if missing_fields:
                 errors.append(f"Missing required fields: {', '.join(missing_fields)}")
                 
-    except Exception as e:
-        errors.append(f"Error validating required fields: {str(e)}")
+        # Get relations from the YAML data
+        yaml_relations = data.get("relations", {})
         
-    return errors
+        if blueprint_relations:
+            
+            # Validate each relation in the YAML
+            for relation_name, relation_values in yaml_relations.items():
+                # Check if relation exists in blueprint schema
+                if relation_name not in blueprint_relations:
+                    relations_errors.append(f"Relation '{relation_name}' not defined in blueprint schema")
+                    continue
+                
+                # Get target blueprint for this relation
+                target_blueprint = blueprint_relations.get(relation_name, {}).get("target", "")
+                
+                if not target_blueprint:
+                    relations_errors.append(f"No target blueprint defined for relation '{relation_name}'")
+                    continue
+                
+    except Exception as e:
+        errors.append(f"Error validating required fields and relations: {str(e)}")
+        
+    return errors, relations_errors
 
 
 async def validate_entity(client: httpx.AsyncClient, settings: PortSettings, payload: Dict[str, Any]) -> Tuple[bool, Dict[str, Any]]:
@@ -134,9 +155,13 @@ async def process_file(client: httpx.AsyncClient, settings: PortSettings, file_p
         
         # Validate required fields from blueprint schema
         print(f"Validating required fields for {file_path} against {blueprint} blueprint schema...")
-        schema_errors = await validate_required_fields(client, settings, data, blueprint)
+        schema_errors, relations_errors = await validate_required_fields_and_relations(client, settings, data, blueprint)
         if schema_errors:
             errors.extend(schema_errors)
+            return errors
+        
+        if relations_errors:
+            errors.extend(relations_errors)
             return errors
         
         # Check if entity exists
